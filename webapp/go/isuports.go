@@ -421,8 +421,14 @@ type PlayerScoreRow struct {
 	UpdatedAt     int64  `db:"updated_at"`
 }
 
+type PlayerScoreRowWithDisplayName struct {
+	PlayerScoreRow
+	DisplayName string `json:"display_name"`
+}
+
 // 排他ロックのためのファイル名を生成する
 func lockFilePath(id int64) string {
+	// TODO: lock ファイルを作らなくても DB の機能で lock 機能を実現できるのでは？
 	tenantDBDir := getEnv("ISUCON_TENANT_DB_DIR", "../tenant_db")
 	return filepath.Join(tenantDBDir, fmt.Sprintf("%d.lock", id))
 }
@@ -1359,17 +1365,21 @@ func competitionRankingHandler(c echo.Context) error {
 		}
 	}
 
+	// NOTE: DB アクセスをまとめたので
 	// player_scoreを読んでいるときに更新が走ると不整合が起こるのでロックを取得する
 	fl, err := flockByTenantID(v.tenantID)
 	if err != nil {
 		return fmt.Errorf("error flockByTenantID: %w", err)
 	}
 	defer fl.Close()
-	pss := []PlayerScoreRow{}
+
+	pss := []PlayerScoreRowWithDisplayName{}
 	if err := tenantDB.SelectContext(
 		ctx,
 		&pss,
-		"SELECT * FROM player_score WHERE tenant_id = ? AND competition_id = ? ORDER BY row_num DESC",
+		"SELECT player_score.*, player_score.display_name FROM player_score "+
+			"INNER JOIN player_row ON player_score.player_id = player_row.id "+
+			"WHERE player_score.tenant_id = ? AND player_score.competition_id = ? ORDER BY player_score.row_num DESC",
 		tenant.ID,
 		competitionID,
 	); err != nil {
@@ -1384,14 +1394,10 @@ func competitionRankingHandler(c echo.Context) error {
 			continue
 		}
 		scoredPlayerSet[ps.PlayerID] = struct{}{}
-		p, err := retrievePlayer(ctx, tenantDB, ps.PlayerID)
-		if err != nil {
-			return fmt.Errorf("error retrievePlayer: %w", err)
-		}
 		ranks = append(ranks, CompetitionRank{
 			Score:             ps.Score,
-			PlayerID:          p.ID,
-			PlayerDisplayName: p.DisplayName,
+			PlayerID:          ps.PlayerID,
+			PlayerDisplayName: ps.DisplayName,
 			RowNum:            ps.RowNum,
 		})
 	}
