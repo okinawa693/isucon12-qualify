@@ -9,6 +9,7 @@ CREATE TABLE competition (
   finished_at BIGINT NULL,
   created_at BIGINT NOT NULL,
   updated_at BIGINT NOT NULL
+  INDEX `competition_id_idx` (`competition.tenant_id`)
 );
 
 CREATE TABLE player (
