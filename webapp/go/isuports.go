@@ -423,7 +423,7 @@ type PlayerScoreRow struct {
 
 type PlayerScoreRowWithDisplayName struct {
 	PlayerScoreRow
-	DisplayName string `json:"display_name"`
+	DisplayName string `db:"display_name"`
 }
 
 // 排他ロックのためのファイル名を生成する
