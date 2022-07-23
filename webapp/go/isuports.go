@@ -188,7 +188,7 @@ func Run() {
 
 	adminDB, err = connectAdminDB()
 	if err != nil {
-		e.Logger.Fatalf("failed to connect db: %v", err)
+		//e.Logger.Fatalf("failed to connect db: %v", err)
 		return
 	}
 	adminDB.SetMaxOpenConns(30)
@@ -197,19 +197,19 @@ func Run() {
 	keyFilename := getEnv("ISUCON_JWT_KEY_FILE", "../public.pem")
 	keysrc, err := os.ReadFile(keyFilename)
 	if err != nil {
-		e.Logger.Fatalf("error os.ReadFile: keyFilename=%s: %w", keyFilename, err)
+		//e.Logger.Fatalf("error os.ReadFile: keyFilename=%s: %w", keyFilename, err)
 		return
 	}
 	jwtKey, _, err = jwk.DecodePEM(keysrc)
 	if err != nil {
-		e.Logger.Fatalf("error jwk.DecodePEM: %w", err)
+		//e.Logger.Fatalf("error jwk.DecodePEM: %w", err)
 		return
 	}
 
 	port := getEnv("SERVER_APP_PORT", "3000")
-	e.Logger.Infof("starting isuports server on : %s ...", port)
+	//e.Logger.Infof("starting isuports server on : %s ...", port)
 	serverPort := fmt.Sprintf(":%s", port)
-	e.Logger.Fatal(e.Start(serverPort))
+	//e.Logger.Fatal(e.Start(serverPort))
 }
 
 // エラー処理関数
