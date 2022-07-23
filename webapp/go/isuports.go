@@ -207,7 +207,7 @@ func Run() {
 
 	port := getEnv("SERVER_APP_PORT", "3000")
 	//e.Logger.Infof("starting isuports server on : %s ...", port)
-	serverPort := fmt.Sprintf(":%s", port)
+	// serverPort := fmt.Sprintf(":%s", port)
 	//e.Logger.Fatal(e.Start(serverPort))
 }
 
