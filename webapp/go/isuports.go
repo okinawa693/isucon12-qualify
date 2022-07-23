@@ -1248,7 +1248,7 @@ func playerHandler(c echo.Context) error {
 	// if err != nil {
 	// 	return fmt.Errorf("error flockByTenantID: %w", err)
 	// }
-	defer fl.Close()
+	// defer fl.Close()
 	pss := make([]PlayerScoreRow, 0, len(cs))
 	for _, c := range cs {
 		ps := PlayerScoreRow{}
