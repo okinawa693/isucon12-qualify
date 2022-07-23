@@ -1365,13 +1365,13 @@ func competitionRankingHandler(c echo.Context) error {
 		}
 	}
 
-	// NOTE: DB アクセスをまとめたので
+	// NOTE: DB アクセスをまとめたのでいらないはず。エラー出るなら元に戻す
 	// player_scoreを読んでいるときに更新が走ると不整合が起こるのでロックを取得する
-	fl, err := flockByTenantID(v.tenantID)
-	if err != nil {
-		return fmt.Errorf("error flockByTenantID: %w", err)
-	}
-	defer fl.Close()
+	// fl, err := flockByTenantID(v.tenantID)
+	// if err != nil {
+	// 	return fmt.Errorf("error flockByTenantID: %w", err)
+	// }
+	// defer fl.Close()
 
 	pss := []PlayerScoreRowWithDisplayName{}
 	if err := tenantDB.SelectContext(
