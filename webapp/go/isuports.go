@@ -568,6 +568,8 @@ func billingReportByCompetition(ctx context.Context, tenantDB dbOrTx, tenantID i
 		billingMap[vh.PlayerID] = "visitor"
 	}
 
+	log.Debugf(`[DEBUG-CONSOLE] len(vhs) = %d`, len(vhs))
+
 	// player_scoreを読んでいるときに更新が走ると不整合が起こるのでロックを取得する
 	// fl, err := flockByTenantID(tenantID)
 	// if err != nil {
@@ -589,6 +591,7 @@ func billingReportByCompetition(ctx context.Context, tenantDB dbOrTx, tenantID i
 		// スコアが登録されている参加者
 		billingMap[pid] = "player"
 	}
+	log.Debugf(`[DEBUG-CONSOLE] len(scoredPlayerIDs) = %d`, len(scoredPlayerIDs))
 
 	// 大会が終了している場合のみ請求金額が確定するので計算する
 	var playerCount, visitorCount int64
@@ -665,6 +668,9 @@ func tenantsBillingHandler(c echo.Context) error {
 	if err := adminDB.SelectContext(ctx, &ts, "SELECT * FROM tenant ORDER BY id DESC"); err != nil {
 		return fmt.Errorf("error Select tenant: %w", err)
 	}
+
+	log.Debugf(`[DEBUG-CONSOLE] len(ts) = %d`, len(ts))
+
 	tenantBillings := make([]TenantWithBilling, 0, len(ts))
 	for _, t := range ts {
 		if beforeID != 0 && beforeID <= t.ID {
@@ -707,6 +713,7 @@ func tenantsBillingHandler(c echo.Context) error {
 			break
 		}
 	}
+	log.Debugf(`[DEBUG-CONSOLE] len(tenantBillings) = %d`, len(tenantBillings))
 	return c.JSON(http.StatusOK, SuccessResult{
 		Status: true,
 		Data: TenantsBillingHandlerResult{
